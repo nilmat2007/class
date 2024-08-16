@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Class Online & Onsite & Tool</title>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <style>
+     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
         body {
@@ -154,23 +154,22 @@
     </div>
 
     <script>
-        let flexMessages = [];
         const LIFF_ID = "2005615503-J0egQn64";
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRVB2GDss-Zo9jaRZfSR0o8AeniyG9jv9EnJ95pXgKzsNEd0zQQlmnj4qj-WmPaPvSIg/exec";
+        let flexMessages = [];
 
-        // Initialize LIFF
-        document.addEventListener('DOMContentLoaded', function() {
-            liff.init({ liffId: LIFF_ID })
-                .then(() => {
-                    console.log("LIFF Initialized");
-                    if (!liff.isLoggedIn()) {
-                        liff.login();
-                    }
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                console.log("LIFF Initialized");
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
                     fetchFlexMessages();
-                })
-                .catch((err) => {
-                    console.log("LIFF Initialization failed:", err);
-                });
+                }
+            } catch (error) {
+                console.error("LIFF Initialization failed:", error);
+            }
         });
 
         function fetchFlexMessages() {
@@ -178,11 +177,11 @@
                 .then(response => response.json())
                 .then(data => {
                     flexMessages = data.map(item => ({
-                        id: item.id, // Assuming the data contains an 'id' field for each item
+                        id: item.id,
                         type: "flex",
                         altText: item.altText,
-                        contents: JSON.parse(item.contents), // Assuming the contents are stored as a JSON string
-                        group: item.group // Assuming there's a 'group' field to filter by group
+                        contents: JSON.parse(item.contents),
+                        group: item.group
                     }));
                     populateDropdown(1); // Load the first group by default
                 })
@@ -220,38 +219,10 @@
         function createBubbleHTML(contents) {
             let html = '';
             if (contents.type === 'bubble') {
-                const header = contents.header || {};
-                const hero = contents.hero || {};
-                const body = contents.body || {};
-                const footer = contents.footer || {};
-
-                html += `<div style="background-color: ${header.backgroundColor || '#ffffff'}; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">`;
-                
-                if (hero.url) {
-                    html += `<img src="${hero.url}" style="width: 100%; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">`;
-                }
-
-                if (header.contents && header.contents.length > 0) {
-                    html += `<h2 style="color: ${header.contents[0].color || '#000000'};">${header.contents[0].text}</h2>`;
-                }
-
-                if (body.contents) {
-                    body.contents.forEach(item => {
-                        html += `<p style="color: ${item.color || '#000000'};">${item.text}</p>`;
-                    });
-                }
-
-                if (footer .contents && footer.contents.length > 0) {
-                    html += `<div style="margin-top: 20px;">`;
-                    footer.contents.forEach(item => {
-                        html += `<button style="padding: 10px 20px; margin-right: 10px; background-color: ${item.color || '#00bcd4'}; color: #ffffff; border: none; border-radius: 5px; cursor: pointer;">${item.text}</button>`;
-                    });
-                    html += `</div>`;
-                }
-
-                html += `</div>`;
+                // Creating HTML based on Flex message content
+                // This part needs to be customized based on the actual content structure
+                html += `<div>Flex Message Contents Here</div>`;
             }
-
             return html;
         }
 
@@ -273,7 +244,6 @@
             }
         });
 
-        // Button Group Toggle
         document.querySelectorAll('.group-btn').forEach(button => {
             button.addEventListener('click', function() {
                 document.querySelectorAll('.group-btn').forEach(btn => btn.classList.remove('active'));
