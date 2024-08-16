@@ -159,21 +159,32 @@
         const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRVB2GDss-Zo9jaRZfSR0o8AeniyG9jv9EnJ95pXgKzsNEd0zQQlmnj4qj-WmPaPvSIg/exec";
 
         // Initialize LIFF
-        liff.init({ liffId: LIFF_ID })
-            .then(() => {
-                console.log("LIFF Initialized");
-                fetchFlexMessages();
-            })
-            .catch((err) => {
-                console.log("LIFF Initialization failed:", err);
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            liff.init({ liffId: LIFF_ID })
+                .then(() => {
+                    console.log("LIFF Initialized");
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                    }
+                    fetchFlexMessages();
+                })
+                .catch((err) => {
+                    console.log("LIFF Initialization failed:", err);
+                });
+        });
 
         function fetchFlexMessages() {
             fetch(APPS_SCRIPT_URL)
                 .then(response => response.json())
                 .then(data => {
-                    flexMessages = data;
-                    populateDropdown(1);
+                    flexMessages = data.map(item => ({
+                        id: item.id, // Assuming the data contains an 'id' field for each item
+                        type: "flex",
+                        altText: item.altText,
+                        contents: JSON.parse(item.contents), // Assuming the contents are stored as a JSON string
+                        group: item.group // Assuming there's a 'group' field to filter by group
+                    }));
+                    populateDropdown(1); // Load the first group by default
                 })
                 .catch(error => console.error('Error:', error));
         }
@@ -230,36 +241,45 @@
                     });
                 }
 
-                if (footer.contents && footer.contents.length > 0) {
+                if (footer .contents && footer.contents.length > 0) {
+                    html += `<div style="margin-top: 20px;">`;
                     footer.contents.forEach(item => {
-                        html += `<button style="background-color: ${item.backgroundColor || '#000000'}; color: ${item.color || '#ffffff'}; padding: 10px; border: none; border-radius: 5px; margin-top: 10px;">${item.text}</button>`;
+                        html += `<button style="padding: 10px 20px; margin-right: 10px; background-color: ${item.color || '#00bcd4'}; color: #ffffff; border: none; border-radius: 5px; cursor: pointer;">${item.text}</button>`;
                     });
+                    html += `</div>`;
                 }
 
                 html += `</div>`;
             }
+
             return html;
         }
 
         document.getElementById('flexSelect').addEventListener('change', updatePreview);
 
-        document.querySelectorAll('.group-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const groupNumber = parseInt(this.getAttribute('data-group'));
-                document.querySelectorAll('.group-btn').forEach(btn => btn.classList.remove('active'));
-                this.classList.add('active');
-                populateDropdown(groupNumber);
-            });
-        });
-
-        document.getElementById('shareBtn').addEventListener('click', function () {
+        document.getElementById('shareBtn').addEventListener('click', function() {
             const selectedIndex = document.getElementById('flexSelect').value;
             if (selectedIndex >= 0) {
                 const flexMessage = flexMessages[selectedIndex];
                 liff.shareTargetPicker([flexMessage])
-                    .then(() => console.log('Message shared'))
-                    .catch(err => console.error('Share failed', err));
+                    .then(() => {
+                        console.log('Flex Message shared successfully!');
+                    })
+                    .catch((err) => {
+                        console.error('Error sharing Flex Message:', err);
+                    });
+            } else {
+                alert('Please select a Flex Message first.');
             }
+        });
+
+        // Button Group Toggle
+        document.querySelectorAll('.group-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.group-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                populateDropdown(parseInt(this.getAttribute('data-group')));
+            });
         });
     </script>
 </body>
