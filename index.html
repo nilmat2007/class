@@ -190,8 +190,6 @@
                     flexSelect.add(option);
                 }
             });
-
-            flexSelect.addEventListener('change', updatePreview);
         }
 
         function updatePreview() {
@@ -234,7 +232,7 @@
 
                 if (footer.contents && footer.contents.length > 0) {
                     footer.contents.forEach(item => {
-                        html += `<button style="background-color: ${item.backgroundColor || '#000000'}; color: ${item.color || '#ffffff'}; padding: 10px; border: none; border-radius: 5 px;">${item.text}</button>`;
+                        html += `<button style="background-color: ${item.backgroundColor || '#000000'}; color: ${item.color || '#ffffff'}; padding: 10px; border: none; border-radius: 5px; margin-top: 10px;">${item.text}</button>`;
                     });
                 }
 
@@ -243,32 +241,25 @@
             return html;
         }
 
-        document.getElementById('shareBtn').addEventListener('click', () => {
+        document.getElementById('flexSelect').addEventListener('change', updatePreview);
+
+        document.querySelectorAll('.group-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const groupNumber = parseInt(this.getAttribute('data-group'));
+                document.querySelectorAll('.group-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                populateDropdown(groupNumber);
+            });
+        });
+
+        document.getElementById('shareBtn').addEventListener('click', function () {
             const selectedIndex = document.getElementById('flexSelect').value;
             if (selectedIndex >= 0) {
                 const flexMessage = flexMessages[selectedIndex];
                 liff.shareTargetPicker([flexMessage])
-                    .then(() => {
-                        console.log("Message shared");
-                    })
-                    .catch((err) => {
-                        console.error("Error sharing message:", err);
-                    });
-            } else {
-                alert("Please select a Flex Message to share.");
+                    .then(() => console.log('Message shared'))
+                    .catch(err => console.error('Share failed', err));
             }
-        });
-
-        document.querySelectorAll('.group-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const groupNumber = btn.getAttribute('data-group');
-                populateDropdown(parseInt(groupNumber));
-
-                document.querySelectorAll('.group-btn').forEach(button => {
-                    button.classList.remove('active');
-                });
-                btn.classList.add('active');
-            });
         });
     </script>
 </body>
