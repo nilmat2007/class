@@ -12,6 +12,8 @@
             background-color: #0f0f0f;
             font-family: 'Poppins', sans-serif;
             color: #e0e0e0;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
@@ -103,13 +105,10 @@
             max-width: 100%;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-        }
-
-        #bubbleContent {
-            padding: 20px;
             background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: #000000;
+            padding: 20px;
+            margin-top: 10px;
         }
 
         .group-btn {
@@ -144,9 +143,7 @@
         </div>
         <div id="previewContainer" style="display: none;">
             <h3>ตัวอย่าง Flex Message:</h3>
-            <div id="bubblePreview">
-                <div id="bubbleContent"></div>
-            </div>
+            <div id="bubblePreview"></div>
         </div>
         <div class="button-container" style="margin-top: 20px;">
             <button id="shareBtn" class="btn btn-primary btn-lg mt-3">Share</button>
@@ -165,27 +162,33 @@
                 if (!liff.isLoggedIn()) {
                     liff.login();
                 } else {
-                    fetchFlexMessages();
+                    await fetchFlexMessages();
                 }
             } catch (error) {
                 console.error("LIFF Initialization failed:", error);
+                alert("Failed to initialize LIFF. Please try refreshing the page.");
             }
         });
 
-        function fetchFlexMessages() {
-            fetch(APPS_SCRIPT_URL)
-                .then(response => response.json())
-                .then(data => {
-                    flexMessages = data.map(item => ({
-                        id: item.id,
-                        type: "flex",
-                        altText: item.altText,
-                        contents: JSON.parse(item.contents),
-                        group: item.group
-                    }));
-                    populateDropdown(1); // Load the first group by default
-                })
-                .catch(error => console.error('Error:', error));
+        async function fetchFlexMessages() {
+            try {
+                const response = await fetch(APPS_SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                flexMessages = data.map(item => ({
+                    id: item.id,
+                    type: "flex",
+                    altText: item.altText,
+                    contents: JSON.parse(item.contents),
+                    group: item.group
+                }));
+                populateDropdown(1); // Load the first group by default
+            } catch (error) {
+                console.error('Error fetching Flex messages:', error);
+                alert("Failed to fetch Flex messages. Please try again later.");
+            }
         }
 
         function populateDropdown(groupNumber) {
@@ -205,40 +208,37 @@
         function updatePreview() {
             const selectedIndex = document.getElementById('flexSelect').value;
             const previewContainer = document.getElementById('previewContainer');
-            const bubbleContent = document.getElementById('bubbleContent');
+            const bubblePreview = document.getElementById('bubblePreview');
 
             if (selectedIndex >= 0) {
                 const flexMessage = flexMessages[selectedIndex];
                 previewContainer.style.display = 'block';
-                bubbleContent.innerHTML = createBubbleHTML(flexMessage.contents);
+                bubblePreview.innerHTML = createBubbleHTML(flexMessage.contents);
             } else {
                 previewContainer.style.display = 'none';
             }
         }
 
         function createBubbleHTML(contents) {
-            let html = '';
-            if (contents.type === 'bubble') {
-                // Creating HTML based on Flex message content
-                // This part needs to be customized based on the actual content structure
-                html += `<div>Flex Message Contents Here</div>`;
-            }
+            let html = '<div style="white-space: pre-wrap;">';
+            html += JSON.stringify(contents, null, 2);
+            html += '</div>';
             return html;
         }
 
         document.getElementById('flexSelect').addEventListener('change', updatePreview);
 
-        document.getElementById('shareBtn').addEventListener('click', function() {
+        document.getElementById('shareBtn').addEventListener('click', async function() {
             const selectedIndex = document.getElementById('flexSelect').value;
             if (selectedIndex >= 0) {
                 const flexMessage = flexMessages[selectedIndex];
-                liff.shareTargetPicker([flexMessage])
-                    .then(() => {
-                        console.log('Flex Message shared successfully!');
-                    })
-                    .catch((err) => {
-                        console.error('Error sharing Flex Message:', err);
-                    });
+                try {
+                    await liff.shareTargetPicker([flexMessage]);
+                    console.log('Flex Message shared successfully!');
+                } catch (err) {
+                    console.error('Error sharing Flex Message:', err);
+                    alert('Failed to share Flex Message. Please try again.');
+                }
             } else {
                 alert('Please select a Flex Message first.');
             }
