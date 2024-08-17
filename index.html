@@ -124,6 +124,12 @@
         .form-group {
             margin-bottom: 20px;
         }
+
+        #errorMessage {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -148,6 +154,10 @@
         <div class="button-container" style="margin-top: 20px;">
             <button id="shareBtn" class="btn btn-primary btn-lg mt-3">Share</button>
         </div>
+        <div class="button-container" style="margin-top: 20px;">
+            <button id="reloadBtn" class="btn btn-primary btn-lg mt-3">Reload Data</button>
+        </div>
+        <div id="errorMessage"></div>
     </div>
 
     <script>
@@ -166,17 +176,21 @@
                 }
             } catch (error) {
                 console.error("LIFF Initialization failed:", error);
-                alert("Failed to initialize LIFF. Please try refreshing the page.");
+                showError("Failed to initialize LIFF. Please try refreshing the page.");
             }
         });
 
         async function fetchFlexMessages() {
             try {
+                showError(""); // Clear any previous error messages
                 const response = await fetch(APPS_SCRIPT_URL);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    throw new Error("Invalid data received from server");
+                }
                 flexMessages = data.map(item => ({
                     id: item.id,
                     type: "flex",
@@ -185,9 +199,10 @@
                     group: item.group
                 }));
                 populateDropdown(1); // Load the first group by default
+                console.log("Flex messages loaded:", flexMessages);
             } catch (error) {
                 console.error('Error fetching Flex messages:', error);
-                alert("Failed to fetch Flex messages. Please try again later.");
+                showError("Failed to fetch Flex messages. Please try again later.");
             }
         }
 
@@ -195,14 +210,18 @@
             const flexSelect = document.getElementById('flexSelect');
             flexSelect.innerHTML = '<option value="-1" selected>-- เลือกข้อความ --</option>';
             
-            flexMessages.forEach((flexMessage, index) => {
-                if (flexMessage.group === groupNumber) {
+            const filteredMessages = flexMessages.filter(msg => msg.group === groupNumber);
+            
+            if (filteredMessages.length === 0) {
+                showError(`No messages found for group ${groupNumber}`);
+            } else {
+                filteredMessages.forEach((flexMessage, index) => {
                     const option = document.createElement('option');
-                    option.value = index;
+                    option.value = flexMessages.indexOf(flexMessage);
                     option.text = `${flexMessage.id}: ${flexMessage.altText}`;
                     flexSelect.add(option);
-                }
-            });
+                });
+            }
         }
 
         function updatePreview() {
@@ -226,6 +245,11 @@
             return html;
         }
 
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+        }
+
         document.getElementById('flexSelect').addEventListener('change', updatePreview);
 
         document.getElementById('shareBtn').addEventListener('click', async function() {
@@ -237,10 +261,10 @@
                     console.log('Flex Message shared successfully!');
                 } catch (err) {
                     console.error('Error sharing Flex Message:', err);
-                    alert('Failed to share Flex Message. Please try again.');
+                    showError('Failed to share Flex Message. Please try again.');
                 }
             } else {
-                alert('Please select a Flex Message first.');
+                showError('Please select a Flex Message first.');
             }
         });
 
@@ -251,6 +275,8 @@
                 populateDropdown(parseInt(this.getAttribute('data-group')));
             });
         });
+
+        document.getElementById('reloadBtn').addEventListener('click', fetchFlexMessages);
     </script>
 </body>
 </html>
