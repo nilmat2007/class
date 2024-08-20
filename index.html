@@ -161,7 +161,8 @@
             flexMessages = data;
             console.log("Fetched Flex Messages:", flexMessages);
             document.getElementById('groupSelect').disabled = false;
-            document.getElementById('groupSelect').dispatchEvent(new Event('change')); // Trigger change event to refresh options
+            // Trigger change event to refresh options
+            document.getElementById('groupSelect').dispatchEvent(new Event('change'));
         })
         .catch(error => {
             console.error('Error:', error);
@@ -192,26 +193,34 @@ document.getElementById('groupSelect').addEventListener('change', () => {
 
 
 
+
+
+
     document.getElementById('flexSelect').addEventListener('change', updatePreview);
 
     function updatePreview() {
-        const selectedIndex = document.getElementById('flexSelect').value;
-        const previewContainer = document.getElementById('previewContainer');
-        const bubbleContent = document.getElementById('bubbleContent');
-        const shareBtn = document.getElementById('shareBtn');
+    const selectedIndex = document.getElementById('flexSelect').value;
+    const previewContainer = document.getElementById('previewContainer');
+    const bubbleContent = document.getElementById('bubbleContent');
+    const shareBtn = document.getElementById('shareBtn');
 
-        if (selectedIndex >= 0) {
-            const flexMessage = flexMessages[selectedIndex];
+    if (selectedIndex >= 0) {
+        const flexMessage = flexMessages[selectedIndex];
+        if (flexMessage && flexMessage.contents) {
             previewContainer.style.display = 'block';
-
-            // Create HTML representation of the Flex Message bubble
             bubbleContent.innerHTML = createBubbleHTML(flexMessage.contents);
             shareBtn.disabled = false;
         } else {
             previewContainer.style.display = 'none';
             shareBtn.disabled = true;
         }
+    } else {
+        previewContainer.style.display = 'none';
+        shareBtn.disabled = true;
     }
+}
+
+
 
     function createBubbleHTML(contents) {
         let html = '';
@@ -251,7 +260,8 @@ document.getElementById('groupSelect').addEventListener('change', () => {
     document.getElementById('shareBtn').addEventListener('click', () => {
     const selectedIndex = document.getElementById('flexSelect').value;
     if (selectedIndex >= 0) {
-        const flexMessage = flexMessages[selectedIndex];
+        const selectedGroup = document.getElementById('groupSelect').value;
+        const flexMessage = flexMessages.find(msg => msg.group == selectedGroup && flexMessages.indexOf(msg) == selectedIndex);
         if (flexMessage && flexMessage.contents) {
             liff.shareTargetPicker([{
                 type: 'flex',
@@ -270,6 +280,7 @@ document.getElementById('groupSelect').addEventListener('change', () => {
         }
     }
 });
+
 
 </script>
 </body>
