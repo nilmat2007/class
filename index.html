@@ -155,35 +155,42 @@
         });
 
     function fetchFlexMessages() {
-        fetch(APPS_SCRIPT_URL)
-            .then(response => response.json())
-            .then(data => {
-                flexMessages = data;
-                document.getElementById('groupSelect').disabled = false;
-            })
-            .catch(error => console.error('Error:', error));
-    }
+    fetch(APPS_SCRIPT_URL)
+        .then(response => response.json())
+        .then(data => {
+            flexMessages = data;
+            console.log("Fetched Flex Messages:", flexMessages);
+            document.getElementById('groupSelect').disabled = false;
+            document.getElementById('groupSelect').dispatchEvent(new Event('change')); // Trigger change event to refresh options
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('ไม่สามารถโหลดข้อมูล Flex Messages ได้');
+        });
+}
 
-    document.getElementById('groupSelect').addEventListener('change', () => {
-        const selectedGroup = document.getElementById('groupSelect').value;
-        const flexSelect = document.getElementById('flexSelect');
-        flexSelect.innerHTML = '<option value="-1" selected>-- เลือกข้อความ --</option>';
-        
-        if (selectedGroup > 0) {
-            // Use the group column (e.g., group name or ID) from your data
-            const filteredMessages = flexMessages.filter(msg => msg.group == selectedGroup);
-            filteredMessages.forEach((flexMessage, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.text = `${flexMessage.id}: ${flexMessage.altText}`;
-                flexSelect.add(option);
-            });
-            flexSelect.disabled = false;
-        } else {
-            flexSelect.disabled = true;
-            document.getElementById('previewContainer').style.display = 'none';
-        }
-    });
+document.getElementById('groupSelect').addEventListener('change', () => {
+    const selectedGroup = document.getElementById('groupSelect').value;
+    const flexSelect = document.getElementById('flexSelect');
+    flexSelect.innerHTML = '<option value="-1" selected>-- เลือกข้อความ --</option>';
+
+    if (selectedGroup > 0) {
+        const filteredMessages = flexMessages.filter(msg => msg.group == selectedGroup);
+        console.log("Filtered Messages:", filteredMessages);
+        filteredMessages.forEach((flexMessage, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.text = `${flexMessage.id}: ${flexMessage.altText}`;
+            flexSelect.add(option);
+        });
+        flexSelect.disabled = false;
+    } else {
+        flexSelect.disabled = true;
+        document.getElementById('previewContainer').style.display = 'none';
+    }
+});
+
+
 
     document.getElementById('flexSelect').addEventListener('change', updatePreview);
 
@@ -242,16 +249,28 @@
     }
 
     document.getElementById('shareBtn').addEventListener('click', () => {
-        const selectedIndex = document.getElementById('flexSelect').value;
-        if (selectedIndex >= 0) {
-            const flexMessage = flexMessages[selectedIndex];
-            liff.shareTargetPicker([flexMessage])
-                .then(() => {
-                    console.log("Message shared");
-                })
-                .catch(error => console.error("Error sharing message:", error));
+    const selectedIndex = document.getElementById('flexSelect').value;
+    if (selectedIndex >= 0) {
+        const flexMessage = flexMessages[selectedIndex];
+        if (flexMessage && flexMessage.contents) {
+            liff.shareTargetPicker([{
+                type: 'flex',
+                altText: flexMessage.altText,
+                contents: flexMessage.contents
+            }])
+            .then(() => {
+                console.log("Message shared");
+            })
+            .catch(error => {
+                console.error("Error sharing message:", error);
+                alert('ไม่สามารถแชร์ข้อความได้');
+            });
+        } else {
+            alert('ข้อความที่เลือกไม่ถูกต้อง');
         }
-    });
+    }
+});
+
 </script>
 </body>
 </html>
