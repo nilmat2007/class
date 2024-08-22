@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class 1+1 TikTok + Ai Short Cut</title>
+    <title>Advanced Class Management System</title>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
         :root {
-            --primary-color: #00ffff;
-            --bg-color: #0f0f0f;
-            --text-color: #e0e0e0;
-            --container-bg: #1a1a1a;
-            --input-bg: #242424;
-            --border-color: #333333;
+            --primary-color: #00c8ff;
+            --secondary-color: #0080ff;
+            --bg-color: #111827;
+            --text-color: #e2e8f0;
+            --container-bg: #1f2937;
+            --input-bg: #374151;
+            --border-color: #4b5563;
         }
 
         * {
@@ -25,23 +26,28 @@
 
         body {
             background-color: var(--bg-color);
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Roboto', sans-serif;
             color: var(--text-color);
             line-height: 1.6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 200, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 128, 255, 0.05) 0%, transparent 20%);
+            background-attachment: fixed;
         }
 
         .container {
             width: 90%;
             max-width: 600px;
-            padding: 2rem;
+            padding: 2.5rem;
             background-color: var(--container-bg);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         h1 {
@@ -49,14 +55,16 @@
             text-align: center;
             margin-bottom: 1.5rem;
             color: var(--primary-color);
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.3);
+            font-size: 2.2rem;
         }
 
         .lead {
             text-align: center;
             margin-bottom: 2rem;
-            color: #a0a0a0;
+            color: #9ca3af;
             font-weight: 300;
+            font-size: 1.1rem;
         }
 
         .form-group {
@@ -78,6 +86,7 @@
             background-color: var(--input-bg);
             color: var(--text-color);
             transition: all 0.3s ease;
+            font-size: 1rem;
         }
 
         .form-control:focus {
@@ -95,17 +104,19 @@
             transition: all 0.3s ease;
             cursor: pointer;
             border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn-primary {
             color: var(--bg-color);
-            background-color: var(--primary-color);
-            box-shadow: 0 4px 6px rgba(0, 255, 255, 0.1);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 4px 6px rgba(0, 200, 255, 0.2);
         }
 
         .btn-primary:hover {
-            background-color: #00d9d9;
             transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 200, 255, 0.3);
         }
 
         .button-container {
@@ -123,13 +134,15 @@
             max-width: 100%;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 200, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         #bubbleContent {
             padding: 1.5rem;
-            background-color: #ffffff;
-            color: #333;
+            color: var(--text-color);
         }
 
         @media (max-width: 768px) {
@@ -142,14 +155,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>Detail Class Online & Onsite</h1>
+        <h1>Advanced Class Management System</h1>
         <p class="lead">เลือกกลุ่มและข้อความที่ต้องการได้เลยครับ</p>
         <div class="form-group">
             <label for="groupSelect">เลือกหัวข้อกลุ่มที่ต้องการ:</label>
             <select class="form-control" id="groupSelect">
                 <option value="-1" selected>-- เลือกกลุ่ม --</option>
                 <option value="1">ONLINE</option>
-                <option value="2">TTS</option>
+                <option value="2">TTS(จับมือทำ)</option>
                 <option value="3">ข้อมูลเพิ่มเติมอื่นๆ</option>
                 <option value="4">ข้อมูลพี่เลี้ยง</option>
             </select>
@@ -161,13 +174,13 @@
             </select>
         </div>
         <div id="previewContainer" style="display: none;">
-            <h3>ตัวอย่าง Flex Message:</h3>
+            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Flex Message Preview:</h3>
             <div id="bubblePreview">
                 <div id="bubbleContent"></div>
             </div>
         </div>
         <div class="button-container">
-            <button id="shareBtn" class="btn btn-primary" disabled>Share</button>
+            <button id="shareBtn" class="btn btn-primary" disabled>Share Message</button>
         </div>
     </div>
 
