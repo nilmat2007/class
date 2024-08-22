@@ -86,9 +86,10 @@
         }
 
         .button-container {
-            display: flex;
-            justify-content: center;
-        }
+    display: flex;
+    justify-content: center;
+    margin-top: 30px; /* เพิ่มบรรทัดนี้ */
+}
 
         #previewContainer {
             margin-top: 20px;
@@ -114,16 +115,17 @@
         <h1>Detail Class Online & Onsite</h1>
         <p class="lead">เลือกกลุ่มและข้อความที่ต้องการได้เลยครับ</p>
         <div class="form-group">
-            <label for="groupSelect">Select Group:</label>
+            <label for="groupSelect">เลือกหัวข้อกลุ่มที่ต้องการ:</label>
             <select class="form-control" id="groupSelect">
                 <option value="-1" selected>-- เลือกกลุ่ม --</option>
                 <option value="1">ONLINE</option>
                 <option value="2">TTS</option>
                 <option value="3">ข้อมูลเพิ่มเติมอื่นๆ</option>
+                <option value="4">ข้อมูลพี่เลี้ยง</option>
             </select>
         </div>
         <div class="form-group">
-            <label for="flexSelect">Select Flex Message:</label>
+            <label for="flexSelect">เลือกข้อความที่จะส่ง:</label>
             <select class="form-control" id="flexSelect" disabled>
                 <option value="-1" selected>-- เลือกข้อความ --</option>
             </select>
@@ -135,13 +137,13 @@
             </div>
         </div>
         <div class="button-container">
-            <button id="shareBtn" class="btn btn-primary btn-lg mt-3" disabled>Share</button>
-        </div>
+    <button id="shareBtn" class="btn btn-primary btn-lg" disabled>Share</button>
+</div>
     </div>
 
     <script>
     let flexMessages = {};
-    const LIFF_ID = "2005615503-drRxpq86"; // แทนที่ด้วย LIFF ID ของคุณ
+    const LIFF_ID = "2005615503-J0egQn64"; // แทนที่ด้วย LIFF ID ของคุณ
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxRVB2GDss-Zo9jaRZfSR0o8AeniyG9jv9EnJ95pXgKzsNEd0zQQlmnj4qj-WmPaPvSIg/exec"; // แทนที่ด้วย URL ของ Apps Script ที่เผยแพร่
 
     // Initialize LIFF
